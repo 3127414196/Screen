@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="GBK" ?>
+<Config version="1" >
+	<ScreenshotRule reportver="20180724" >
+		<Rule type="DirectUIHWND" action="ignore" >
+		</Rule>
+		<Rule type="TXGuiFoundation" action="ignore">
+		</Rule>
+	</ScreenshotRule>
+	
+	<DecryptNotice>
+		<Notice title="2018.07.24 制定截屏规则" />
+	</DecryptNotice>
+</Config>
