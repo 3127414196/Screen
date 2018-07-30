@@ -1,4 +1,5 @@
 #include <map>
+#include <vector>
 using namespace std;
 
 #pragma once
@@ -134,11 +135,17 @@ public:
     int Getswitch_id(int id);
     int Geturl_id(int id);
     int Getmd5_id(int id);
-    //返回整个CMapInfo结构 只读
-    const CMapInfo* GetMapInfo(int id);
+    //获取policy_id对应的id集合
+    BOOL GetPolicyIDMapInfo(int policy_id, vector<int> &id);
 
 private:
+    // key为id, value是整个CMpInfo的结构
     map<int, CMapInfo*> LocalMap;
+
+    //key为policy_id, value是id的集合
+    map<int, vector<int>> PolicyIDMap;
+
+    void CreatPolicyIDMap();
     int ConfigVersion;
 };
 

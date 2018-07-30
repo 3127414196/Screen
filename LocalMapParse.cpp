@@ -147,8 +147,6 @@ CMapInfo * ParseDoc(xml_node<> *root, int *id)
     return newItem;
 }
 
-
-
 CLocalMapParse::CLocalMapParse(CString FileName)
 {
     std::shared_ptr<char *> content;
@@ -199,7 +197,35 @@ CLocalMapParse::CLocalMapParse(CString FileName)
         LocalMap.insert(map<int, CMapInfo*>::value_type(id, newItem));
         root = root->next_sibling();
     }
+
+    CreatPolicyIDMap();
+
     return;
+}
+
+void CLocalMapParse::CreatPolicyIDMap()
+{
+    map<int, CMapInfo*>::iterator Mapiter;
+    map<int, std::vector<int>>::iterator Policyiter;
+
+    int policy_id = 0;
+    int id = 0;
+    for (Mapiter = LocalMap.begin(); Mapiter != LocalMap.end(); Mapiter++) {
+        id = Mapiter->first;
+        policy_id = Getpolicy_id(id);
+
+        Policyiter = PolicyIDMap.find(policy_id);
+        if (Policyiter != PolicyIDMap.end())
+        {
+            Policyiter->second.push_back(id);
+        }
+        else
+        {
+            vector<int> temp;
+            temp.push_back(id);
+            PolicyIDMap.insert(map<int, vector<int>>::value_type(policy_id, temp));
+        }
+    }
 }
 
 //获取每个关键字的值
@@ -306,13 +332,18 @@ int CLocalMapParse::Getmd5_id(int id)
     return -1;
 }
 
-const CMapInfo* CLocalMapParse::GetMapInfo(int id)
+BOOL CLocalMapParse::GetPolicyIDMapInfo(int policy_id, std::vector<int> &id)
 {
-    map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
+    map<int, std::vector<int>>::iterator iter = PolicyIDMap.find(policy_id);
 
-    if (iter != LocalMap.end())
+    if (iter != PolicyIDMap.end())
     {
-        return iter->second;
+        int size = iter->second.size();
+
+        for (int i = 0; i < size; i++)
+            id.push_back((iter->second)[i]);
+        return TRUE;
     }
-    return NULL;
+
+    return FALSE;
 }
