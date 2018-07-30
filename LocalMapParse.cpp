@@ -61,7 +61,7 @@ unsigned int char2int(char *array)
     return (unsigned int) strtol(array, NULL, 10);
 }
 
-CMapInfo * ParseDoc(xml_node<> *root, int *id)
+CMapInfo * ParseDoc(xml_node<> *root, int& id)
 {
     xml_attribute<> *attribute = NULL;
     CMapInfo *newItem = NULL;
@@ -81,7 +81,7 @@ CMapInfo * ParseDoc(xml_node<> *root, int *id)
         attribute = root->first_attribute();
         if (strcmp(attribute->name(), "id") != 0)
             break;
-        *id = char2int(attribute->value());
+        id = char2int(attribute->value());
         attribute = attribute->next_attribute();
         if (strcmp(attribute->name(), "name") != 0)
             break;
@@ -155,12 +155,6 @@ CLocalMapParse::CLocalMapParse(CString FileName)
     }
     shared_ptr<char *>::element_type val = *content;
 
-    if (content == NULL)
-    {
-        LogDebug("文件打开失败", 0);
-        abort();
-    }
-
     // 解析文档存入map中
     xml_document<> doc;
     try
@@ -176,9 +170,9 @@ CLocalMapParse::CLocalMapParse(CString FileName)
     xml_node<> *root = doc.first_node();
     if (NULL == root)
     {
-        LogDebug("文章root为NULL", 0);
         abort();
     }
+
     xml_attribute<> *attribute = root->first_attribute();
     ConfigVersion = char2int(attribute->value());
 
@@ -187,15 +181,18 @@ CLocalMapParse::CLocalMapParse(CString FileName)
     int id = 0;
     while (root)
     {
-        CMapInfo *newItem = ParseDoc(root, &id);
+        CMapInfo *newItem = ParseDoc(root, id);
        
         if (newItem == NULL)
-            break;
+        {
+            abort();
+        }
 
         LocalMap.insert(map<int, CMapInfo*>::value_type(id, newItem));
         root = root->next_sibling();
     }
 
+    //根据已经创建好的LocalMap来创建PolicyIDMap
     CreatPolicyIDMap();
 
     return;
@@ -211,7 +208,7 @@ void CLocalMapParse::CreatPolicyIDMap()
     for (Mapiter = LocalMap.begin(); Mapiter != LocalMap.end(); Mapiter++)
     {
         id = Mapiter->first;
-        policy_id = Getpolicy_id(id);
+        Getpolicy_id(id, policy_id);
 
         Policyiter = PolicyIDMap.find(policy_id);
         if (Policyiter != PolicyIDMap.end())
@@ -228,107 +225,135 @@ void CLocalMapParse::CreatPolicyIDMap()
 }
 
 //获取每个关键字的值
-CString CLocalMapParse::Getname(int id)
+BOOL CLocalMapParse::Getname(int id, CString& name)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getname();
+        name = iter->second->_Getname();
+        return TRUE;
     }
-    return _T("");
+    return FALSE;
 }
 
-CString CLocalMapParse::Getguid(int id)
+BOOL CLocalMapParse::Getguid(int id, CString& guid)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getguid();
+        guid = iter->second->_Getguid();
+        return TRUE;
     }
-    return _T("");
+    return FALSE;
 }
 
-CString CLocalMapParse::Getpath(int id)
+BOOL CLocalMapParse::Getpath(int id, CString& path)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getpath();
+        path = iter->second->_Getpath();
+        return TRUE;
     }
-    return _T("");
+    return FALSE;
 }
-int CLocalMapParse::Getbuild_min(int id)
+
+BOOL CLocalMapParse::Getbuild_min(int id, int& build_min)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getbuild_min();
+        build_min = iter->second->_Getbuild_min();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
 }
-int CLocalMapParse::Getbuild_max(int id)
+
+BOOL CLocalMapParse::Getbuild_max(int id, int& build_max)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getbuild_max();
+        build_max = iter->second->_Getbuild_max();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
 }
-int CLocalMapParse::Getappid(int id)
+
+BOOL CLocalMapParse::Getappid(int id, int& appid)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getappid();
+        appid = iter->second->_Getappid();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
 }
-int CLocalMapParse::Getpolicy_id(int id)
+
+BOOL CLocalMapParse::Getpolicy_id(int id, int& policy_id)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getpolicy_id();
+        policy_id = iter->second->_Getpolicy_id();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
 }
-int CLocalMapParse::Getswitch_id(int id)
+
+BOOL CLocalMapParse::Getswitch_id(int id, int& switch_id)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getswitch_id();
+        switch_id = iter->second->_Getswitch_id();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
 }
-int CLocalMapParse::Geturl_id(int id)
+
+BOOL CLocalMapParse::Geturl_id(int id, int& url_id)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Geturl_id();
+        url_id = iter->second->_Geturl_id();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
 }
-int CLocalMapParse::Getmd5_id(int id)
+
+BOOL CLocalMapParse::Getmd5_id(int id, int& md5_id)
 {
     map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
 
     if (iter != LocalMap.end())
     {
-        return iter->second->_Getmd5_id();
+        md5_id = iter->second->_Getmd5_id();
+        return TRUE;
     }
-    return -1;
+    return FALSE;
+}
+
+const CMapInfo* CLocalMapParse::GetMapInfo(int id)
+{
+    map<int, CMapInfo*>::iterator iter = LocalMap.find(id);
+    
+    if (iter != LocalMap.end())
+    {
+        return iter->second;
+    }
+    return NULL;
 }
 
 BOOL CLocalMapParse::GetPolicyIDMapInfo(int policy_id, std::vector<int> &id)

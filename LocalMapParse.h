@@ -1,5 +1,6 @@
 #include <map>
 #include <vector>
+
 using namespace std;
 
 #pragma once
@@ -82,7 +83,7 @@ public:
         return md5_id;
     }
 
-    //此函数为了调试
+    // 此函数为了调试
     CString to_CString()
     {
         CString str;
@@ -113,13 +114,12 @@ class CLocalMapParse
 {
 public:
     CLocalMapParse();
+    ~CLocalMapParse();
 
     /**
     * @brief 从file中读取数据 并填充LocalMap,FileName=路径+文件名
     */
     CLocalMapParse(CString FileName);
-
-    virtual ~CLocalMapParse();
 
     /**
     * @brief 获取整个配置的版本号
@@ -130,19 +130,25 @@ public:
     }
 
     // 以下是根据id来获取对应的关键字对应的值
-    CString Getname(int id);
-    CString Getguid(int id);
-    CString Getpath(int id);
-    int Getbuild_min(int id);
-    int Getbuild_max(int id);
-    int Getappid(int id);
-    int Getpolicy_id(int id);
-    int Getswitch_id(int id);
-    int Geturl_id(int id);
-    int Getmd5_id(int id);
+    // 如果id对应的项存在,返回TRUE;反之FALSE
+    BOOL Getname(int id, CString& name);
+    BOOL Getguid(int id, CString& guid);
+    BOOL Getpath(int id, CString& path);
+    BOOL Getbuild_min(int id, int& build_min);
+    BOOL Getbuild_max(int id, int& build_max);
+    BOOL Getappid(int id, int& appid);
+    BOOL Getpolicy_id(int id, int& policy_id);
+    BOOL Getswitch_id(int id, int& switch_id);
+    BOOL Geturl_id(int id, int& url_id);
+    BOOL Getmd5_id(int id, int& md5_id);
+
+    //根据id获取具体项
+    const CMapInfo* GetMapInfo(int id);
+
     //获取policy_id对应的id集合
     BOOL GetPolicyIDMapInfo(int policy_id, vector<int> &id);
 
+    //为了调试设置的函数
     CString to_CString()
     {
         CString str = _T("");
@@ -164,7 +170,12 @@ private:
     //key为policy_id, value是id的集合
     map<int, vector<int>> PolicyIDMap;
 
+    /**
+    * @brief 创建PolicyIDMap
+    */
     void CreatPolicyIDMap();
+    
+    // 版本号
     int ConfigVersion;
 };
 
