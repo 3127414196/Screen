@@ -50,17 +50,15 @@ BOOL ReadXmlFile(CString FileName, std::shared_ptr<char*>& content)
     content = make_shared<char *>(new char[asize + 1]);
     std::shared_ptr<char *>::element_type pChar = *content;
     WideCharToMultiByte(CP_ACP, 0, *pWideChar, wsize, pChar, asize, NULL, 0);
-    
-    LogDebug(pChar, strlen(pChar));
 
     return TRUE;
 }
 
 //char->int
-int char2int(char *array)
+unsigned int char2int(char *array)
 {
-    //使用这个函数能不能满足所有情况 但是做基本的转换是没有问题的,不能够检测出错误123abc
-    return atoi(array);
+    //只能转换到unsigned int大小
+    return (unsigned int) strtol(array, NULL, 10);
 }
 
 CMapInfo * ParseDoc(xml_node<> *root, int *id)
@@ -71,13 +69,13 @@ CMapInfo * ParseDoc(xml_node<> *root, int *id)
     do
     {
         //用于暂时存储的变量
-        int build_min;
-        int build_max;
-        int appid;
-        int policy_id;
-        int switch_id;
-        int url_id;
-        int md5_id;
+        unsigned int build_min;
+        unsigned int build_max;
+        unsigned int appid;
+        unsigned int policy_id;
+        unsigned int switch_id;
+        unsigned int url_id;
+        unsigned int md5_id;
 
         //CfgItem
         attribute = root->first_attribute();
@@ -210,7 +208,8 @@ void CLocalMapParse::CreatPolicyIDMap()
 
     int policy_id = 0;
     int id = 0;
-    for (Mapiter = LocalMap.begin(); Mapiter != LocalMap.end(); Mapiter++) {
+    for (Mapiter = LocalMap.begin(); Mapiter != LocalMap.end(); Mapiter++)
+    {
         id = Mapiter->first;
         policy_id = Getpolicy_id(id);
 

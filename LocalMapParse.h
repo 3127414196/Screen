@@ -40,11 +40,6 @@ public:
 
     }
 
-    virtual ~CMapInfo()
-    {
-        delete(this);
-    }
-
     //获取每个关键字的值
     CString _Getname()
     {
@@ -87,17 +82,27 @@ public:
         return md5_id;
     }
 
+    //此函数为了调试
+    CString to_CString()
+    {
+        CString str;
+        str.Format(_T("%u %u %u %u %u %u %u"), _Getbuild_min(), _Getbuild_max(), _Getappid(), _Getpolicy_id(), _Getswitch_id(), _Geturl_id(), _Getmd5_id());
+        str = _Getname() + _T("  ") + _Getguid() + _T("  ") + _Getpath() + _T(" ") + str + _T("\n");
+
+        return str;
+    }
+
 private:
     CString name;
     CString guid;
     CString path;
-    int build_min;
-    int build_max;
-    int appid;
-    int policy_id;
-    int switch_id;
-    int url_id;
-    int md5_id;
+    unsigned int build_min;
+    unsigned int build_max;
+    unsigned int appid;
+    unsigned int policy_id;
+    unsigned int switch_id;
+    unsigned int url_id;
+    unsigned int md5_id;
 };
 
 
@@ -137,6 +142,20 @@ public:
     int Getmd5_id(int id);
     //获取policy_id对应的id集合
     BOOL GetPolicyIDMapInfo(int policy_id, vector<int> &id);
+
+    CString to_CString()
+    {
+        CString str = _T("");
+
+        map<int, CMapInfo*>::iterator Mapiter;
+
+        for (Mapiter = LocalMap.begin(); Mapiter != LocalMap.end(); Mapiter++)
+        {
+            str = str + Mapiter->second->to_CString();
+        }
+
+        return str;
+    }
 
 private:
     // key为id, value是整个CMpInfo的结构
