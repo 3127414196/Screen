@@ -23,38 +23,37 @@ CLocalMapParse::~CLocalMapParse()
 }
 
 
-char *ReadXmlFile(CString FileName, std::shared_ptr<char> content)
+BOOL ReadXmlFile(CString FileName, std::shared_ptr<char*>& content)
 {
     CFile mFile;
 
     if (!mFile.Open(FileName, CFile::modeRead | CFile::typeBinary))
     {
         //读取文件失败
-        return NULL;
+        return FALSE;
     }
 
     UINT FileSize = (UINT)mFile.GetLength();
-    char *buf = new char[FileSize];
 
-    memset(buf, 0, FileSize);
-    mFile.Read(buf, FileSize);
+    shared_ptr<char*> buf = make_shared<char*>(new char[FileSize]);
+    memset(*buf, 0, FileSize);
+    mFile.Read(*buf, FileSize);
     mFile.Close();
 
     //先讲UTF-8转换成wchar
-    int wsize = MultiByteToWideChar(CP_UTF8, 0, buf, FileSize, NULL, 0);
-    wchar_t* pWideChar = new wchar_t[wsize];
-    MultiByteToWideChar(CP_UTF8, 0, buf, FileSize, pWideChar, wsize);
+    int wsize = MultiByteToWideChar(CP_UTF8, 0, *buf, FileSize, NULL, 0);
+    shared_ptr<wchar_t*> pWideChar = make_shared<wchar_t*>(new wchar_t[wsize]);
+    MultiByteToWideChar(CP_UTF8, 0, *buf, FileSize, *pWideChar, wsize);
 
     //再讲wchar转换成char
-    int asize = WideCharToMultiByte(CP_ACP, 0, pWideChar, wsize, NULL, 0, NULL, 0);
-    char *pChar = new char[asize + 1];
-    WideCharToMultiByte(CP_ACP, 0, pWideChar, wsize, pChar, asize, NULL, 0);
+    int asize = WideCharToMultiByte(CP_ACP, 0, *pWideChar, wsize, NULL, 0, NULL, 0);
+    content = make_shared<char *>(new char[asize + 1]);
+    std::shared_ptr<char *>::element_type pChar = *content;
+    WideCharToMultiByte(CP_ACP, 0, *pWideChar, wsize, pChar, asize, NULL, 0);
+    
     LogDebug(pChar, strlen(pChar));
 
-    //把程序中分配的内存释放，但是最后转换成的char型内容在调用函数中释放
-    delete[] buf;
-    delete[] pWideChar;
-    return pChar;
+    return TRUE;
 }
 
 //char->int
@@ -152,7 +151,14 @@ CMapInfo * ParseDoc(xml_node<> *root, int *id)
 
 CLocalMapParse::CLocalMapParse(CString FileName)
 {
-    char *content = ReadXmlFile(FileName);
+    std::shared_ptr<char *> content;
+    if (!ReadXmlFile(FileName, content))
+    {
+        //读取文件失败
+        abort();
+    }
+    shared_ptr<char *>::element_type val = *content;
+
     if (content == NULL)
     {
         LogDebug("文件打开失败", 0);
@@ -163,11 +169,10 @@ CLocalMapParse::CLocalMapParse(CString FileName)
     xml_document<> doc;
     try
     {
-        doc.parse<0>(content);
+        doc.parse<0>(val);
     }
     catch (const std::exception&)
     {
-        delete(content);
         abort();
     }
 
@@ -194,10 +199,6 @@ CLocalMapParse::CLocalMapParse(CString FileName)
         LocalMap.insert(map<int, CMapInfo*>::value_type(id, newItem));
         root = root->next_sibling();
     }
-
-    //后面不需要用到，释放空间
-    delete(content);
-
     return;
 }
 
