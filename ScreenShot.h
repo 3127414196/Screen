@@ -9,7 +9,7 @@
 #endif
 
 #include "resource.h"		// 主符号
-#include "ReadXml.h"
+
 
 // CScreenShotApp: 
 // 有关此类的实现，请参阅 ScreenShot.cpp
@@ -19,7 +19,6 @@ class CScreenShotApp : public CWinApp
 {
 public:
 	CScreenShotApp();
-    ReadXml *readxml;
 
 // 重写
 public:

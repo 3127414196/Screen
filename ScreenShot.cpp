@@ -39,14 +39,6 @@ CScreenShotApp theApp;
 
 BOOL CScreenShotApp::InitInstance()
 {
-    //添加读取xml文件
-    //如果文件读取失败，就直接退出程序
-    readxml = new ReadXml("temp.xml");
-    if (readxml == NULL)
-    {
-        return FALSE;
-    }
-
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。  否则，将无法创建窗口。
@@ -78,7 +70,6 @@ BOOL CScreenShotApp::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
-
 	CScreenShotDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
@@ -103,10 +94,6 @@ BOOL CScreenShotApp::InitInstance()
 	{
 		delete pShellManager;
 	}
-    if (readxml != NULL)
-    {
-        delete readxml;
-    }
 
 #ifndef _AFXDLL
 	ControlBarCleanUp();

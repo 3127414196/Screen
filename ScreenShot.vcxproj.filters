@@ -39,18 +39,6 @@
     <ClInclude Include="WindowMonitor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="rapidxml.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="rapidxml_print.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="rapidxml_utils.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ReadXml.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="WndInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -72,9 +60,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WindowMonitor.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ReadXml.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="WndInfo.cpp">

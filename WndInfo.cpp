@@ -102,20 +102,20 @@ BOOL CWndInfo::QueryMouse(CPoint& ptMouse)
 CAtlString CWndInfo::PrintWnd() const
 {
 	CAtlString strLog;
-	strLog.Format(L" [ hwnd(0x%0x), process(%s), title(%s), class(%s), rect(%d,%d,%d,%d), size(%d,%d), style(0x%0x), exstyle(0x%0x) ]", 
+	strLog.Format(L" [ hwnd(0x%0x), process(%s), title(%s), class(%s), rect(%d,%d,%d,%d), size(%d,%d), style(0x%0x), exstyle(0x%0x)) ]", 
 		m_hWnd, m_strProcessName, m_strTitle, m_strWndClass, m_rcWnd.left, m_rcWnd.top, m_rcWnd.right, m_rcWnd.bottom,
 		m_rcWnd.Width(), m_rcWnd.Height(), m_dwStyle, m_dwExStyle);
 
+    CLogFile::WriteLog(strLog);
 	return strLog;
 }
 
 void CWndInfo::Print() const
 {
-    char buffer[200];
+    CString strLog = _T("");
 
-    memset(buffer, 0, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer) / sizeof(char), "%s ======================== 窗口信息 =======================\n", __FUNCTIONW__);
-    LogDebug(buffer, sizeof(buffer));
+    strLog.Format(_T("%s ======================== 窗口信息 =======================\n"), __FUNCTIONW__);
+    CLogFile::WriteLog(strLog);
 
 
 	// 屏幕坐标
@@ -123,27 +123,23 @@ void CWndInfo::Print() const
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcArea, 0);
 
 
-    memset(buffer, 0, sizeof(buffer));
-	snprintf(buffer, sizeof(buffer) / sizeof(char), "%s, sysscreen(%d,%d), sysclient(%d,%d)", __FUNCTIONW__,
+    strLog.Format(_T("%s, sysscreen(%d,%d), sysclient(%d,%d)"), __FUNCTIONW__,
 		GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), rcArea.Width(), rcArea.Height());
-    LogDebug(buffer, strlen(buffer));
+    CLogFile::WriteLog(strLog);
 
 
-    memset(buffer, 0, sizeof(buffer));
-	snprintf(buffer, sizeof(buffer) / sizeof(char), "%s, hwnd(%0x), title(%s), process(%s), class(%s), Parent(%s)", __FUNCTIONW__,
+    strLog.Format(_T("%s, hwnd(%0x), title(%s), process(%s), class(%s), Parent(%s)"), __FUNCTIONW__,
 		m_hWnd, m_strTitle, m_strProcessName, m_strWndClass, m_strParentProcess);
-    LogDebug(buffer, sizeof(buffer));
+    CLogFile::WriteLog(strLog);
 
 
-    memset(buffer, 0, sizeof(buffer));
-	snprintf(buffer, sizeof(buffer) / sizeof(char), "%s, hwnd(%0x), rect(%d,%d,%d,%d), size(%d,%d), style(%0x), exstyle(%0x)", __FUNCTIONW__,
+    strLog.Format(_T("%s, hwnd(%0x), rect(%d,%d,%d,%d), size(%d,%d), style(%0x), exstyle(%0x)"), __FUNCTIONW__,
 		m_hWnd, m_rcWnd.left, m_rcWnd.top, m_rcWnd.right, m_rcWnd.bottom, m_rcWnd.Width(), m_rcWnd.Height(), m_dwStyle, m_dwExStyle);
-    LogDebug(buffer, strlen(buffer));
+    CLogFile::WriteLog(strLog);
 
-    memset(buffer, 0, sizeof(buffer));
-	snprintf(buffer, sizeof(buffer) / sizeof(char), "%s, hwnd(%0x), procpath(%s), parentpath(%s)", __FUNCTIONW__,
+    strLog.Format(_T("%s, hwnd(%0x), procpath(%s), parentpath(%s)"), __FUNCTIONW__,
 		m_hWnd, m_strProcessPath, m_strParentPath);
-    LogDebug(buffer, strlen(buffer));
+    CLogFile::WriteLog(strLog);
 }
 
 BOOL CWndInfo::IsInvalid()
@@ -154,7 +150,7 @@ BOOL CWndInfo::IsInvalid()
 	{
         memset(buffer, 0, 200);
 		snprintf(buffer, 200, "%s, 无效窗口(hwnd:0x%0x event:0x%0x)，标题、进程、类名，都为空", __FUNCTIONW__, m_hWnd, m_WndEvent);
-        LogDebug(buffer, sizeof(buffer) + 1);
+        //LogDebug(buffer, sizeof(buffer) + 1);
 		return TRUE;
 	}
 
@@ -169,6 +165,11 @@ BOOL CWndInfo::IsInvalid()
 		snprintf(buffer, 200, "%s, 无效窗口(hwnd:0x%0x event:0x%0x)，窗口大小为0*0", __FUNCTIONW__, m_hWnd, m_WndEvent);
 		return TRUE;
 	}
+
+    if (m_strWndClass.Compare(_T("TXGuiFoundation")) == 0)
+    {
+        return TRUE;
+    }
 
 	return FALSE;
 }

@@ -50,6 +50,12 @@ public:
     BOOL CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt = TRUE);
 
 
+    /**
+    *	@brief 从指定窗口hwnd的创建一个上下文无关位图
+    *	@param	[in] hwnd为空时，使用的是桌面窗口
+    */
+    BOOL CreateDIBBitmapFromHWND(HWND hwnd, BOOL bBitblt = TRUE);
+
 	/**
 	*	@brief 给位图叠加颜色
 	*	@param	[in] clr 要叠加的颜色
@@ -82,5 +88,4 @@ public:
 	HBITMAP	m_hOldBitmap;
 	int m_cx;
 	int m_cy;
-
 };

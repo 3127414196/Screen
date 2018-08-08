@@ -74,9 +74,9 @@ public:
 	// 判定两个窗口相等，实际上只关心进程、窗口标题、类名、位置
 	friend bool operator==(const CWndInfo& left, const CWndInfo& right)
 	{
-		if ((left.m_strTitle.CompareNoCase(right.m_strTitle) == 0) &&
-			(left.m_strProcessName.CompareNoCase(right.m_strProcessName) == 0) &&
-			(left.m_strWndClass.CompareNoCase(right.m_strWndClass) == 0) &&
+		if (//(left.m_strTitle.CompareNoCase(right.m_strTitle) == 0) &&
+			//(left.m_strProcessName.CompareNoCase(right.m_strProcessName) == 0) &&
+			//(left.m_strWndClass.CompareNoCase(right.m_strWndClass) == 0) &&
 			(left.m_rcWnd == right.m_rcWnd))
 		{
 			return true;

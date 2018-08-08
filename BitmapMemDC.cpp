@@ -31,12 +31,17 @@ void CBitmapMemDC::_Clear()
 			SelectObject(m_hMemDC, m_hOldBitmap);
 			m_hOldBitmap = NULL;
 		}
-
-		DeleteDC(m_hMemDC);		
+        // -1 GDI Object
+        if (!DeleteDC(m_hMemDC))
+        {
+            int error = GetLastError();
+            assert(error == 0);
+        }
 		m_hMemDC = NULL;
 	}
 	if (NULL != m_hBitmap)
 	{
+        // -1 GDI Object
 		DeleteObject(m_hBitmap);
 		m_hBitmap = NULL;
 	}	
@@ -186,8 +191,8 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
     }
     else
     {
-        //hDCtmp = ::GetWindowDC((HWND)(hwnd));
-        hDCtmp = ::GetDC((HWND)(hwnd));
+        // +1 GDI Object
+        hDCtmp = ::GetWindowDC((HWND)(hwnd));
         if (hDCtmp != NULL) {
             CRect rc;
             ::GetWindowRect(hwnd, &rc);
@@ -198,7 +203,13 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
         }
     }
 
-    if ((NULL == hDCtmp) || (m_cx == 0) || (m_cy == 0))
+    //注意 原来发生资源泄露的部分,在这里如果直接返回了，就会hDCtmp的内存没有被释放
+    /*if ((NULL == hDCtmp) || (m_cx == 0) || (m_cy == 0))
+    {
+        return FALSE;
+    }*/
+
+    if ((NULL == hDCtmp))
     {
         return FALSE;
     }
@@ -206,12 +217,124 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
     BOOL bOK = FALSE;
     do
     {
+        if (m_cx <= 0 || m_cy <= 0)
+            break;
+
+        // +1 GDI Object
         m_hMemDC = CreateCompatibleDC(hDCtmp);
         if (NULL == m_hMemDC)
         {
             break;
         }
+        // +1 GDI Object
         m_hBitmap = CreateCompatibleBitmap(hDCtmp, m_cx, m_cy);
+        if (NULL == m_hBitmap)
+        {
+            break;
+        }
+        m_hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
+
+        if (bBitblt && !BitBlt(m_hMemDC, 0, 0, m_cx, m_cy, hDCtmp, 0, 0, SRCCOPY | CAPTUREBLT))
+        {
+            break;
+        }
+
+        bOK = TRUE;
+    } while (FALSE);
+
+    if (bGetDC)
+    {
+        if (hwnd == NULL)
+        {
+            ReleaseDC(::GetDesktopWindow(), hDCtmp);
+        }
+        else
+        {
+            ReleaseDC(hwnd, hDCtmp);    //-1 GDI Object
+        }
+    }
+
+    if (!bOK)
+    {
+        _Clear();
+    }
+
+    return bOK;
+}
+
+BOOL CBitmapMemDC::CreateDIBBitmapFromHWND(HWND hwnd, BOOL bBitblt)
+{
+    _Clear();
+
+    HDC hDCtmp = NULL;
+    BOOL bGetDC = FALSE;
+
+    //屏幕的宽和高
+    int Screen_X_length = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    int Screen_Y_length = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+    if (hwnd == NULL)
+    {
+        m_cx = Screen_X_length;
+        m_cy = Screen_Y_length;
+        hDCtmp = GetDC(::GetDesktopWindow());
+        bGetDC = TRUE;
+    }
+    else
+    {
+        // +1个GDI OBJ
+        hDCtmp = ::GetWindowDC((HWND)(hwnd));
+        if (hDCtmp != NULL) {
+            CRect rc;
+            ::GetWindowRect(hwnd, &rc);
+            m_cx = ((rc.left + rc.Width()) > Screen_X_length) ? (Screen_X_length - rc.left) : rc.Width();
+            m_cy = ((rc.top + rc.Height()) > Screen_Y_length) ? (Screen_Y_length - rc.top) : rc.Height();
+
+            bGetDC = TRUE;
+        }
+    }
+
+    //注意 原来发生资源泄露的部分,在这里如果直接返回了，就会hDCtmp的内存没有被释放
+    //if ((NULL == hDCtmp)|| (m_cx == 0) || (m_cy == 0))
+    //{
+    //    return FALSE;
+    //}
+    
+    if (NULL == hDCtmp)
+    {
+        return FALSE;
+    }
+
+    BOOL bOK = FALSE;
+    do
+    {
+        if (m_cx <= 0 || m_cy <= 0)
+            break;
+
+        // +1个GDI Object
+        m_hMemDC = CreateCompatibleDC(hDCtmp);
+        if (NULL == m_hMemDC)
+        {
+            break;
+        }
+
+        BITMAPINFOHEADER bmih;
+        memset(&bmih, 0, sizeof(BITMAPINFOHEADER));
+        bmih.biSize = sizeof(BITMAPINFOHEADER);
+        bmih.biBitCount = 24;
+        bmih.biCompression = BI_RGB;
+        bmih.biPlanes = 1;
+        bmih.biWidth = m_cx;
+        bmih.biHeight = m_cy;
+
+        BITMAPINFO bmi;
+        memset(&bmi, 0, sizeof(BITMAPINFO));
+        bmi.bmiHeader = bmih;
+
+        void* p;    //指向位图中的内容，会自动分配，后面也会自己释放
+
+        // +1 个GDI Object
+        m_hBitmap = ::CreateDIBSection(m_hMemDC, &bmi, DIB_RGB_COLORS, &p, NULL, 0);
         if (NULL == m_hBitmap)
         {
             break;
@@ -231,7 +354,8 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
         if (hwnd == NULL)
             bOK &= ReleaseDC(::GetDesktopWindow(), hDCtmp);
         else
-            bOK &= ReleaseDC(hwnd, hDCtmp);
+            bOK &= ReleaseDC(hwnd, hDCtmp);     //-1 GDI Object
+        hDCtmp = NULL;
     }
 
     if (!bOK)

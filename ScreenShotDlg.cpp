@@ -6,14 +6,8 @@
 #include "ScreenShot.h"
 #include "ScreenShotDlg.h"
 #include "afxdialogex.h"
-#include "BitmapMemDC.h"
 #include "WindowMonitor.h"
-
-#include <WinUser.h>
-#include <iostream>
-#include <vector>
-
-using namespace std;
+#include "BitmapMemDC.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -38,9 +32,9 @@ void CScreenShotDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CScreenShotDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-    ON_BN_CLICKED(IDOK, &CScreenShotDlg::OnBnClickedOk)
-    ON_BN_CLICKED(IDCANCEL, &CScreenShotDlg::OnBnClickedCancel)
-    ON_BN_CLICKED(IDC_BUTTON2, &CScreenShotDlg::OnBnClickedButton2)
+    ON_BN_CLICKED(Monitor, &CScreenShotDlg::OnBnClickedMonitor)
+    ON_BN_CLICKED(ScreenShot, &CScreenShotDlg::OnBnClickedScreenshot)
+    ON_BN_CLICKED(StopMonitor, &CScreenShotDlg::OnBnClickedStopmonitor)
 END_MESSAGE_MAP()
 
 
@@ -96,60 +90,17 @@ HCURSOR CScreenShotDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-vector<HWND> hwnd_list;
 
-BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam)
-{
-    cout << "[Child window] window handle :" << hwnd << endl;
-    return TRUE;
-}
-
-
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
-{
-
-    /*
-    * Remarks
-    The EnumWindows function does not enumerate child windows,
-    with the exception of a few top-level windows owned by the
-    system that have the WS_CHILD style.
-    */
-    cout << "[Parent window] window handle: " << hwnd << endl;
-    CBitmapMemDC *mapDc = new CBitmapMemDC();
-
-    if (!mapDc->CreateBitmapFromHWND(hwnd, TRUE)) {
-        exit(-1);
-    }
-
-    delete(mapDc);
-
-    //hwnd_list.push_back(hwnd);
-    //EnumChildWindows(hwnd, EnumChildProc, lParam);
-
-    return TRUE;
-}
-
-void CScreenShotDlg::OnBnClickedOk()
+void CScreenShotDlg::OnBnClickedMonitor()
 {
     InitializeMSAA();
 }
 
 
-void CScreenShotDlg::OnBnClickedCancel()
+void CScreenShotDlg::OnBnClickedScreenshot()
 {
-    ShutdownMSAA();
-    CDialogEx::OnCancel();
-}
-
-
-void CScreenShotDlg::OnBnClickedButton2()
-{
-    //HWND hwnd = ::FindWindow(NULL, _T("ÆóÒµÎ¢ÐÅ"));
-    //HWND hwnd = ::FindWindow(_T("WeChatMainWndForPC"), _T("Î¢ÐÅ"));
-    //HWND hwnd = (HWND)(0x00380A8E); //Foxmail
-
     CBitmapMemDC *mapDc = new CBitmapMemDC();
-    HWND hwnd = (HWND)(0x00560356);
+    HWND hwnd = (HWND)(0x000205D2);
 
     CRect rc;
     ::GetWindowRect(hwnd, &rc);
@@ -158,7 +109,7 @@ void CScreenShotDlg::OnBnClickedButton2()
     str.Format(_T("%d %d"), rc.Width(), rc.Height());
     MessageBox(str);
 
-    if (!mapDc->CreateBitmapFromHWND(hwnd, TRUE)) {
+    if (!mapDc->CreateDIBBitmapFromHWND(hwnd, TRUE)) {
         MessageBox(_T("½ØÍ¼Ê§°Ü"));
         CDialogEx::OnCancel();
         return;
@@ -170,6 +121,13 @@ void CScreenShotDlg::OnBnClickedButton2()
     SetClipboardData(CF_BITMAP, mapDc->m_hBitmap);
     CloseClipboard(); 	//¹Ø±Õ¼ôÌù°å  
 
-    mapDc->SaveBmp(mapDc->m_hBitmap, _T("Î¢ÐÅ.bmp"));
+    mapDc->SaveBmp(mapDc->m_hBitmap, _T("../Output/Test/BMP/Î¢ÐÅ.bmp"));
     delete(mapDc);
+}
+
+
+void CScreenShotDlg::OnBnClickedStopmonitor()
+{
+    ShutdownMSAA();
+    CDialog::OnCancel();
 }
