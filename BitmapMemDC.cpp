@@ -171,7 +171,7 @@ BOOL CBitmapMemDC::AddColorMaskToBitmap(COLORREF clr, BYTE byTransparent)
 	return bOK;
 }
 
-BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
+int CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
 {
     _Clear();
 
@@ -192,6 +192,7 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
     else
     {
         // +1 GDI Object
+        //这里要把超出四个方向缓冲区的部分都要算一遍，待做
         hDCtmp = ::GetWindowDC((HWND)(hwnd));
         if (hDCtmp != NULL) {
             CRect rc;
@@ -211,35 +212,39 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
 
     if ((NULL == hDCtmp))
     {
-        return FALSE;
+        return ERR_GETDC;
     }
 
-    BOOL bOK = FALSE;
+    int bOK = ERR_SUCCESS;
     do
     {
         if (m_cx <= 0 || m_cy <= 0)
+        {
+            bOK = ERR_WINSIZE;
             break;
+        }
 
         // +1 GDI Object
         m_hMemDC = CreateCompatibleDC(hDCtmp);
         if (NULL == m_hMemDC)
         {
+            bOK = ERR_CREATEDC;
             break;
         }
         // +1 GDI Object
         m_hBitmap = CreateCompatibleBitmap(hDCtmp, m_cx, m_cy);
         if (NULL == m_hBitmap)
         {
+            bOK = ERR_CREATEBITMAP;
             break;
         }
         m_hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
 
         if (bBitblt && !BitBlt(m_hMemDC, 0, 0, m_cx, m_cy, hDCtmp, 0, 0, SRCCOPY | CAPTUREBLT))
         {
+            bOK = ERR_BITBLT;
             break;
         }
-
-        bOK = TRUE;
     } while (FALSE);
 
     if (bGetDC)
@@ -254,7 +259,7 @@ BOOL CBitmapMemDC::CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt)
         }
     }
 
-    if (!bOK)
+    if (bOK != ERR_SUCCESS)
     {
         _Clear();
     }
@@ -341,10 +346,17 @@ BOOL CBitmapMemDC::CreateDIBBitmapFromHWND(HWND hwnd, BOOL bBitblt)
         }
         m_hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
 
-        if (bBitblt && !BitBlt(m_hMemDC, 0, 0, m_cx, m_cy, hDCtmp, 0, 0, SRCCOPY | CAPTUREBLT))
+        while (TRUE)
         {
-            break;
+            if (bBitblt && !BitBlt(m_hMemDC, 0, 0, m_cx, m_cy, hDCtmp, 0, 0, SRCCOPY | CAPTUREBLT))
+            {
+                break;
+            }
         }
+        //if (bBitblt && !BitBlt(m_hMemDC, 0, 0, m_cx, m_cy, hDCtmp, 0, 0, SRCCOPY | CAPTUREBLT))
+        //{
+        //    break;
+        //}
 
         bOK = TRUE;
     } while (FALSE);

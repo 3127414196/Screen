@@ -36,6 +36,9 @@ public:
 		return FALSE;
 	}
 
+    void SetEventInfo(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+    void CopyEventInfo(CWndEventInfo& eventinfo);
+
 	HWINEVENTHOOK m_hWinEventHook;
 	DWORD m_dwEvent;
 	HWND m_hWnd;

@@ -1,26 +1,26 @@
 
-// ScreenShot.cpp : 定义应用程序的类行为。
+// MutiThreadScreenShot.cpp : 定义应用程序的类行为。
 //
 
 #include "stdafx.h"
-#include "ScreenShot.h"
-#include "ScreenShotDlg.h"
+#include "MutiThreadScreenShot.h"
+#include "MutiThreadScreenShotDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CScreenShotApp
+// CMutiThreadScreenShotApp
 
-BEGIN_MESSAGE_MAP(CScreenShotApp, CWinApp)
+BEGIN_MESSAGE_MAP(CMutiThreadScreenShotApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CScreenShotApp 构造
+// CMutiThreadScreenShotApp 构造
 
-CScreenShotApp::CScreenShotApp()
+CMutiThreadScreenShotApp::CMutiThreadScreenShotApp()
 {
 	// 支持重新启动管理器
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -30,14 +30,14 @@ CScreenShotApp::CScreenShotApp()
 }
 
 
-// 唯一的一个 CScreenShotApp 对象
+// 唯一的一个 CMutiThreadScreenShotApp 对象
 
-CScreenShotApp theApp;
+CMutiThreadScreenShotApp theApp;
 
 
-// CScreenShotApp 初始化
+// CMutiThreadScreenShotApp 初始化
 
-BOOL CScreenShotApp::InitInstance()
+BOOL CMutiThreadScreenShotApp::InitInstance()
 {
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
@@ -70,7 +70,7 @@ BOOL CScreenShotApp::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
-	CScreenShotDlg dlg;
+	CMutiThreadScreenShotDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)

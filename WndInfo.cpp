@@ -2,6 +2,28 @@
 #include "WndInfo.h"
 #include <WindowsX.h> 
 
+void CWndEventInfo::SetEventInfo(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+    this->m_hWinEventHook = hWinEventHook;
+    this->m_dwEvent = dwEvent;
+    this->m_hWnd = hwnd;
+    this->m_idObject = idObject;
+    this->m_idChild = idChild;
+    this->m_dwEventThread = dwEventThread;
+    this->m_dwmsEventTime = dwmsEventTime;
+}
+
+void CWndEventInfo::CopyEventInfo(CWndEventInfo& eventinfo)
+{
+    this->m_hWinEventHook = eventinfo.m_hWinEventHook;
+    this->m_dwEvent = eventinfo.m_dwEvent;
+    this->m_hWnd = eventinfo.m_hWnd;
+    this->m_idObject = eventinfo.m_idObject;
+    this->m_idChild = eventinfo.m_idChild;
+    this->m_dwEventThread = eventinfo.m_dwEventThread;
+    this->m_dwmsEventTime = eventinfo.m_dwmsEventTime;
+}
+
 CWndInfo::CWndInfo()
 : m_hWnd(NULL)
 , m_rcWnd(0,0,0,0)
@@ -149,7 +171,7 @@ BOOL CWndInfo::IsInvalid()
 	if (m_strTitle.IsEmpty() && m_strProcessName.IsEmpty() && m_strProcessPath.IsEmpty() && m_strWndClass.IsEmpty())
 	{
         memset(buffer, 0, 200);
-		snprintf(buffer, 200, "%s, 无效窗口(hwnd:0x%0x event:0x%0x)，标题、进程、类名，都为空", __FUNCTIONW__, m_hWnd, m_WndEvent);
+		//snprintf(buffer, 200, "%s, 无效窗口(hwnd:0x%0x event:0x%0x)，标题、进程、类名，都为空", __FUNCTIONW__, m_hWnd, m_WndEvent);
         //LogDebug(buffer, sizeof(buffer) + 1);
 		return TRUE;
 	}
@@ -162,7 +184,7 @@ BOOL CWndInfo::IsInvalid()
 
 	if (m_rcWnd.Width() == 0 && m_rcWnd.Height() == 0)
 	{
-		snprintf(buffer, 200, "%s, 无效窗口(hwnd:0x%0x event:0x%0x)，窗口大小为0*0", __FUNCTIONW__, m_hWnd, m_WndEvent);
+		//snprintf(buffer, 200, "%s, 无效窗口(hwnd:0x%0x event:0x%0x)，窗口大小为0*0", __FUNCTIONW__, m_hWnd, m_WndEvent);
 		return TRUE;
 	}
 

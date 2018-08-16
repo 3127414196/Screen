@@ -18,10 +18,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ScreenShot.h">
+    <ClInclude Include="MutiThreadScreenShot.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenShotDlg.h">
+    <ClInclude Include="MutiThreadScreenShotDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -36,21 +36,27 @@
     <ClInclude Include="BitmapMemDC.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WindowMonitor.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WndInfo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="LogFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoCriticalSection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WinEventHook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SingletonEventHandle.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ScreenShot.cpp">
+    <ClCompile Include="MutiThreadScreenShot.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ScreenShotDlg.cpp">
+    <ClCompile Include="MutiThreadScreenShotDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -59,28 +65,28 @@
     <ClCompile Include="BitmapMemDC.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WindowMonitor.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WndInfo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="LogFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WinEventHook.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SingletonEventHandle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ScreenShot.rc">
+    <ResourceCompile Include="MutiThreadScreenShot.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\ScreenShot.rc2">
+    <None Include="res\MutiThreadScreenShot.rc2">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\ScreenShot.ico">
+    <Image Include="res\MutiThreadScreenShot.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -33,6 +33,16 @@ public:
 		return *this;
 	}
 
+    enum ErrCode
+    {
+        ERR_BITBLT = -5,
+        ERR_CREATEBITMAP = -4,
+        ERR_CREATEDC = -3,
+        ERR_WINSIZE = -2,
+        ERR_GETDC = -1,
+        ERR_SUCCESS = 0,
+    };
+
 	/**
 	*	@brief 从指定DC的指定矩形区域创建一个位图
 	*	@param	[in] (x, y) 左上的坐标，如果hDC不是桌面DC，那么始终为0;如果是桌面DC，那么采用的是需要截取窗口句柄的坐标(CRect rc; ::GetWindowRect(hwnd, &rc);) (rc.left, rc.top)
@@ -44,10 +54,10 @@ public:
 
 
     /**
-    *	@brief 从指定窗口hwnd的创建一个位图
+    *	@brief 从指定窗口hwnd的创建一个位图，如果创建失败就返回ErrCode
     *	@param	[in] hwnd为空时，使用的是桌面窗口
     */
-    BOOL CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt = TRUE);
+    int CreateBitmapFromHWND(HWND hwnd, BOOL bBitblt = TRUE);
 
 
     /**
