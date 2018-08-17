@@ -22,6 +22,15 @@ private:
     Tobject& operator=(const Tobject&)
     {}
 
+    ~CSingletonEventHandle()
+    {
+        if (m_pInstance)
+        {
+            delete m_pInstance;
+            m_pInstance = NULL;
+        }
+    }
+
     static Tobject* m_pInstance;
 };
 

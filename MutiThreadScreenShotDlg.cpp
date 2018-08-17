@@ -135,32 +135,32 @@ DWORD WINAPI EventHandle(LPVOID pParam)
             //先判断是窗口是否有效
             if (eventinfo.IsInValid())
             {
-                CString strLog;
+                /*CString strLog;
                 strLog.Format(_T("[InValid] event(0x%x) hwnd(0x%x) idObject(0x%x) idChild(0x%x) dwEventThread(%d) dwEventTime(%d)\n"), eventinfo.m_event, eventinfo.m_hwnd, eventinfo.m_idObject, eventinfo.m_idChild, eventinfo.m_dwEventThread, eventinfo.m_dwmsEventTime);
-                CLogFile::WriteLog(strLog);
+                CLogFile::WriteLog(strLog);*/
                 break;
             }
 
             //有效的情况下在延时截图
-            Sleep(50);
+            Sleep(100);
 
             CBitmapMemDC mapDc;
             int errcode = 0;
             if ((errcode = mapDc.CreateBitmapFromHWND(eventinfo.m_hwnd, TRUE)) < 0) {
-                CString strLog;
+                /*CString strLog;
                 strLog.Format(_T("[mapDC] %d event(0x%x) hwnd(0x%x) idObject(0x%x) idChild(0x%x) dwEventThread(%d) dwEventTime(%d)\n"), errcode, eventinfo.m_event, eventinfo.m_hwnd, eventinfo.m_idObject, eventinfo.m_idChild, eventinfo.m_dwEventThread, eventinfo.m_dwmsEventTime);
-                CLogFile::WriteLog(strLog);
+                CLogFile::WriteLog(strLog);*/
                 break;
             }
 
-            CString strLog;
+            /*CString strLog;
             strLog.Format(_T("[%d]    event(0x%x) hwnd(0x%x) idObject(0x%x) idChild(0x%x) dwEventThread(%d) dwEventTime(%d)\n"), i, eventinfo.m_event, eventinfo.m_hwnd, eventinfo.m_idObject, eventinfo.m_idChild, eventinfo.m_dwEventThread, eventinfo.m_dwmsEventTime);
             CLogFile::WriteLog(strLog);
 
             CString filename;
             filename.Format(_T("../Output/Test/BMP/%d.bmp"), i);
             mapDc.SaveBmp(mapDc.m_hBitmap, filename);
-            i++;
+            i++;*/
         } while (FALSE);
     }
 
@@ -173,6 +173,9 @@ void CMutiThreadScreenShotDlg::OnBnClickedMonitor()
     {
         m_hTheds[0] = CreateThread(NULL, 0, EventHook, NULL, 0, &(m_dwthreadid[0]));
         m_hTheds[1] = CreateThread(NULL, 0, EventHandle, NULL, 0, &(m_dwthreadid[1]));
+        CString str;
+        str.Format(_T("%d %d"), m_dwthreadid[0], m_dwthreadid[1]);
+        MessageBox(str);
         m_IsMonitor = TRUE;
     }
 }
@@ -230,6 +233,8 @@ void CMutiThreadScreenShotDlg::OnBnClickedStopmonitor()
         WaitForMultipleObjects(2, m_hTheds, TRUE, INFINITE);
         CloseHandle(m_hTheds[0]);
         CloseHandle(m_hTheds[1]);
+
+        delete (&eventpool);
 
         m_IsMonitor = FALSE;
     }

@@ -30,20 +30,18 @@ public:
     }
 
     void AddTask(Tobject &obj)
-    {
-            //如果队列已满，m_rear==m_front直接进行覆盖
+    {        //如果队列已满，m_rear==m_front直接进行覆盖
         if (m_nowsize >= m_maxsize)
         {
-            m_front++;
-            m_pObj[(m_rear + 1) % m_maxsize] = obj;
-            m_rear++;
+            m_front = (m_front + 1) % m_maxsize;
+            m_pObj[m_rear] = obj;
         }
         else
         {
-            m_pObj[(m_rear + 1) % m_maxsize] = obj;
-            m_rear++;
+            m_pObj[m_rear] = obj;
             m_nowsize++;
         }
+        m_rear = (m_rear + 1) % m_maxsize;
     }
 
     BOOL GetTask(Tobject* outObject)
@@ -54,8 +52,8 @@ public:
             if (m_nowsize <= 0)
                 break;
 
-            *outObject = m_pObj[(m_front + 1) % m_maxsize];
-            m_front++;
+            *outObject = m_pObj[m_front];
+            m_front = (m_front + 1) % m_maxsize;
             m_nowsize--;
             bOK = TRUE;
         } while (FALSE);
